@@ -1,0 +1,19 @@
+version: "2"
+services:
+
+  calibreimage:
+    build: build
+    ulimits:
+      nofile:
+        soft: 20000
+        hard: 40000
+      nproc: 65535
+    ports:
+      - "8808:8080"
+    volumes:
+      - library:/calibre_library
+    stdin_open: true
+
+volumes:
+  library:
+    driver: local
