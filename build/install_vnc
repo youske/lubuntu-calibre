@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#----- vnc -----
+
+VNC_USER="${VNC_USER:-vnc}" \
+VNC_PASSWORD="${VNC_PASSWORD:-0qwertyuiop}" \
+VNC_PORT="${VNC_PORT:-5901}" \
+VNC_DEPTH="${VNC_DEPTH:-24}" \
+VNC_DISPLAY="${VNC_DISPLAY:-1}" \
+VNC_GEOMETRY="${VNC_GEOMETRY:-1280x768}"
+
+VNC_OPTIONS="-depth ${VNC_DEPTH} -geometry ${VNC_GEOMETRY}  -rfbport ${VNC_PORT} :${VNC_DISPLAY}" \
+VNC_HOME="/home/${VNC_USER}"
+
+apt-get install -y tightvncserver
+#RUN useradd -D --create-home --user-group && \
+#    echo "${VNC_USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
+#    chown -R ${VNC_USER}:${VNC_USER} ${VNC_HOME}
+
+#RUN su vnc -c " mkdir -p ${VNC_HOME}/.vnc " && \
+#    su vnc -c "echo ${VNC_PASSWORD} | vncpasswd -f > ${VNC_HOME}/.vnc/passwd" && \
+#    su vnc -c "chmod 600 ${VNC_HOME}/.vnc/passwd"
