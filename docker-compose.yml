@@ -9,9 +9,9 @@ services:
         hard: 40000
       nproc: 65535
     ports:
-      - "8808:8080"
+      - "5901:5901"
     volumes:
-      - library:/calibre_library
+      - library:/home/vnc/Calibre Library
     stdin_open: true
 
 volumes:

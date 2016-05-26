@@ -21,19 +21,18 @@ ENV LANG=C.UTF-8 \
     PORT=22 \
     WORK_DIR=/
 
-ENV COMMONPACKAGE='locales bash logrotate supervisor git bzip2 curl wget ca-certificates' \
-    LUBUNTUPACKAGE='xorg lxde-core lxappearance lxterminal lubuntu-icon-theme lubuntu-artwork-16-04 lubuntu-lxpanel-icons lubuntu-artwork xfonts-100dpi xfonts-100dpi-transcoded xfonts-75dpi xfonts-75dpi-transcoded xfonts-base' \
-    FONTPACKAGE='fonts-noto-cjk fonts-takao-mincho fonts-takao-gothic fonts-takao-pgothic fonts-stix' \
-    FCITXPACKAGE='fcitx fcitx-mozc fcitx-libs-qt5 fcitx-frontend-qt5'
+ENV COMMONPACKAGE='locales bash vim-tiny logrotate supervisor git bzip2 curl wget ca-certificates' \
+    LUBUNTUPACKAGE='xorg xterm lxde-core lxappearance lxsession-data lxterminal lxinput lubuntu-icon-theme lubuntu-artwork-16-04 lubuntu-lxpanel-icons lubuntu-artwork xfonts-100dpi xfonts-100dpi-transcoded xfonts-75dpi xfonts-75dpi-transcoded xfonts-base ' \
+    FONTPACKAGE='fonts-ipafont-mincho fonts-ipafont-gothic' \
+    LANGPACKAGE='language-pack-ja language-pack-ja ibus-mozc'
 
 # apt-get install
 RUN apt-get update && apt-get -y upgrade
 RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${LUBUNTUPACKAGE}
 RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${COMMONPACKAGE}
-#RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${FONTPACKAGE}
-#RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${FCITXPACKAGE}
-RUN apt-get install -y wget language-pack-ja && \
-    update-locale LANG=${LANGUAGE:-ja_JP.UTF-8}
+RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${FONTPACKAGE}
+RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${LANGPACKAGE}
+RUN update-locale LANG=${LANGUAGE:-ja_JP.UTF-8}
 
 #    RUN apt-get update && apt-get -y upgrade && \
 
@@ -44,11 +43,6 @@ RUN wget -q --no-check-certificate ${ENTRYKIT_DOWNLOAD} -O- | tar zx && \
 # gosu
 RUN wget -q --no-check-certificate ${GOSU_DOWNLOAD} -O /usr/bin/gosu && chmod +x /usr/bin/gosu
 
-#----- vnc -----
-
-COPY install_vnc /tmp/install_vnc
-RUN /bin/bash /tmp/install_vnc
-
 #------ calibre ------
 
 ENV CALIBRE_LIBRARY=/calibre_library \
@@ -57,8 +51,7 @@ ENV USER=vnc \
     PASSWORD=vncpass \
     MAX_COVER=300x400
 
-#openssh-client poppler mesa-gl xdg-utils
-ENV CALIBREPACKAGE='python-pip python-dev build-essential imagemagick' \
+ENV CALIBREPACKAGE='imagemagick python-pip python-dev build-essential' \
     PIPPACKAGE='dateutil pil pyqt pygments' \
     BUILD_PACKAGE='wget git build-base linux-headers' \
     VNCPORT=5901-5999
@@ -72,11 +65,28 @@ RUN wget -q --no-check-certificate ${CALIBRE_URL} -O- | python -c "import sys; m
 # calibre setup
 RUN mkdir ${CALIBRE_LIBRARY} && mkdir ${CALIBRE_LIBRARY}/import
 
+#----- vnc -----
+
+ENV VNC_USER="${VNC_USER:-vnc}" \
+    VNC_PASSWORD="${VNC_PASSWORD:-vncpass}" \
+    VNC_PORT="${VNC_PORT:-5901}" \
+    VNC_DEPTH="${VNC_DEPTH:-24}" \
+    VNC_DISPLAY="${VNC_DISPLAY:-1}" \
+    VNC_GEOMETRY="${VNC_GEOMETRY:-1280x768}"
+
+ENV VNC_OPTIONS="-depth ${VNC_DEPTH} -geometry ${VNC_GEOMETRY}  -rfbport ${VNC_PORT} :${VNC_DISPLAY}" \
+    VNC_HOME="/home/${VNC_USER}"
+
+COPY install_vnc /tmp/install_vnc
+RUN . /tmp/install_vnc
+
 # remove build package
 #RUN apt-get autoremove -y python-dev build-essential && rm -rf /tmp/* /var/cache/apk/*
 
+COPY start.sh /tmp/start.sh
 EXPOSE ${PORT} ${VNCPORT}
 
+#USER vnc
 WORKDIR ${WORK_DIR}
-#ENTRYPOINT ["switch","shell=/bin/bash","--","calibre-server","--auto-reload","--with-library","${CALIBRE_LIBRARY}","--username","${USER}","--password","${PASSWORD}","--max-cover","${MAX_COVER}","--port","${PORT}"]
-CMD ["bash"]
+ENTRYPOINT ["switch","shell=/bin/bash","--","bash","/tmp/start.sh"]
+#CMD ["bash"]
