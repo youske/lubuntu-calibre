@@ -17,24 +17,15 @@ ENV ENTRYKIT_DOWNLOAD=https://github.com/progrium/entrykit/releases/download/v${
 ENV GOSU_VERSION=1.7
 ENV GOSU_DOWNLOAD=https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-amd64
 
-ENV LANG=C.UTF-8 \
-    PORT=22 \
-    WORK_DIR=/
-
-ENV COMMONPACKAGE='locales bash vim-tiny logrotate supervisor git bzip2 curl wget ca-certificates' \
+ENV COMMONPACKAGE='bash vim-tiny logrotate supervisor git bzip2 curl wget ca-certificates' \
     LUBUNTUPACKAGE='xorg xterm lxde-core lxappearance lxsession-data lxterminal lxinput lubuntu-icon-theme lubuntu-artwork-16-04 lubuntu-lxpanel-icons lubuntu-artwork xfonts-100dpi xfonts-100dpi-transcoded xfonts-75dpi xfonts-75dpi-transcoded xfonts-base ' \
     FONTPACKAGE='fonts-ipafont-mincho fonts-ipafont-gothic' \
-    LANGPACKAGE='language-pack-ja language-pack-ja ibus-mozc'
+    LANGPACKAGE='locales language-pack-ja language-pack-ja ibus-mozc'
 
 # apt-get install
-RUN apt-get update && apt-get -y upgrade
-RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${LUBUNTUPACKAGE}
-RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${COMMONPACKAGE}
-RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${FONTPACKAGE}
-RUN DEBIAN_FRONTEND=nointeractive apt-get install -y ${LANGPACKAGE}
-RUN update-locale LANG=${LANGUAGE:-ja_JP.UTF-8}
-
-#    RUN apt-get update && apt-get -y upgrade && \
+RUN apt-get update && apt-get -y upgrade && \
+    DEBIAN_FRONTEND=nointeractive apt-get install -y ${COMMONPACKAGE} ${LUBUNTUPACKAGE} ${FONTPACKAGE} ${LANGPACKAGE} && \
+    update-locale LANG=${LANGUAGE:-ja_JP.UTF-8}
 
 # entrykit install
 RUN wget -q --no-check-certificate ${ENTRYKIT_DOWNLOAD} -O- | tar zx && \
@@ -43,29 +34,9 @@ RUN wget -q --no-check-certificate ${ENTRYKIT_DOWNLOAD} -O- | tar zx && \
 # gosu
 RUN wget -q --no-check-certificate ${GOSU_DOWNLOAD} -O /usr/bin/gosu && chmod +x /usr/bin/gosu
 
-#------ calibre ------
-
-ENV CALIBRE_LIBRARY=/calibre_library \
-    CALIBRE_URL=https://raw.githubusercontent.com/kovidgoyal/calibre/master/setup/linux-installer.py
-ENV USER=vnc \
-    PASSWORD=vncpass \
-    MAX_COVER=300x400
-
-ENV CALIBREPACKAGE='imagemagick python-pip python-dev build-essential' \
-    PIPPACKAGE='dateutil pil pyqt pygments' \
-    BUILD_PACKAGE='wget git build-base linux-headers' \
-    VNCPORT=5901-5999
-
-RUN apt-get install -y  ${CALIBREPACKAGE}
-#&& pip install -U ${PIPPACKAGE}
-
-# calibre install
-RUN wget -q --no-check-certificate ${CALIBRE_URL} -O- | python -c "import sys; main=lambda:sys.stderr.write('Download Failed\n'); exec(sys.stdin.read()); main()"
-
-# calibre setup
-RUN mkdir ${CALIBRE_LIBRARY} && mkdir ${CALIBRE_LIBRARY}/import
 
 #----- vnc -----
+
 
 ENV VNC_USER="${VNC_USER:-vnc}" \
     VNC_PASSWORD="${VNC_PASSWORD:-vncpass}" \
@@ -74,19 +45,33 @@ ENV VNC_USER="${VNC_USER:-vnc}" \
     VNC_DISPLAY="${VNC_DISPLAY:-1}" \
     VNC_GEOMETRY="${VNC_GEOMETRY:-1280x768}"
 
-ENV VNC_OPTIONS="-depth ${VNC_DEPTH} -geometry ${VNC_GEOMETRY}  -rfbport ${VNC_PORT} :${VNC_DISPLAY}" \
-    VNC_HOME="/home/${VNC_USER}"
+ENV VNC_HOME="/home/${VNC_USER}"
 
 COPY install_vnc /tmp/install_vnc
 RUN . /tmp/install_vnc
 
+#------ calibre ------
+
+ENV CALIBRE_USER='calibre' \
+    CALIBRE_PASSWORD='calibreadmin' \
+    CALIBRE_MAXCOVER="300x280" \
+    CALIBRE_PORT=8088 \
+    CALIBRE_LIBRARY="/Calibre_Library" \
+    CALIBRE_URL=https://raw.githubusercontent.com/kovidgoyal/calibre/master/setup/linux-installer.py \
+    CALIBRE_PACKAGE='imagemagick python-pip python-dev build-essential'
+
+# calibre install
+RUN apt-get install -y  ${CALIBRE_PACKAGE} && \
+    wget -q --no-check-certificate ${CALIBRE_URL} -O- | python -c "import sys; main=lambda:sys.stderr.write('Download Failed\n'); exec(sys.stdin.read()); main()"
+RUN mkdir -p "${CALIBRE_LIBRARY}" && mkdir -p "${CALIBRE_LIBRARY}/import" && \
+    chown -R ${VNC_USER}:${VNC_USER} "${CALIBRE_LIBRARY}"
+
 # remove build package
-#RUN apt-get autoremove -y python-dev build-essential && rm -rf /tmp/* /var/cache/apk/*
+RUN apt-get autoremove -y python-dev build-essential && rm -rf /tmp/* /var/cache/apk/*
 
-COPY start.sh /tmp/start.sh
-EXPOSE ${PORT} ${VNCPORT}
+COPY start.sh ${VNC_HOME}/start.sh
+RUN chown -R ${VNC_USER}:${VNC_USER} ${VNC_HOME}
 
-#USER vnc
-WORKDIR ${WORK_DIR}
-ENTRYPOINT ["switch","shell=/bin/bash","--","bash","/tmp/start.sh"]
-#CMD ["bash"]
+EXPOSE ${CALIBRE_PORT} ${VNC_PORT}
+WORKDIR ${VNC_HOME}
+ENTRYPOINT ["switch","shell=/bin/bash","--","/bin/bash","${VNC_HOME}/start.sh"]
