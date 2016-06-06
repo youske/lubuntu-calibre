@@ -1,13 +1,23 @@
-dockerfile Alpine Linux with calibre
-======================================
+dockerfile lubuntu with calibre
+===============================
 
 # 概要
-alpinelinux ベースminicondaを導入したイメージ
+lubuntu(ubuntu 16.04) ベースにebook管理用calibreを導入したイメージ
+calibreと書籍公開用サーバ
+
 
 # 導入
-
 base image
-frolvlad/alpine-glibc
+youske/lubuntu-calibre
+
+
+# 起動
+  docker run -it -p 5901:5901 -p 8808:8808 --rm youske/lubuntu-calibre
+  docker run -it -p 5901:5901 -p 8808:8808 --rm youske/lubuntu-calibre shell
+
+
+
+# その他
 
 entrykit
 https://github.com/progrium/entrykit
@@ -15,10 +25,10 @@ https://github.com/progrium/entrykit
 gosu
 https://github.com/tianon/gosu
 
-miniconda
-https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+lubuntu (lxde)
+日本語フォント+
 
-# setting
+# パスワードの再設定
 user: admin
 pass: admin
 homedir: /home/admin

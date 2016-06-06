@@ -49,6 +49,8 @@ ENV VNC_HOME="/home/${VNC_USER}"
 
 COPY install_vnc /tmp/install_vnc
 RUN . /tmp/install_vnc
+COPY start.sh ${VNC_HOME}/start.sh
+RUN chown -R ${VNC_USER}:${VNC_USER} ${VNC_HOME}
 
 #------ calibre ------
 
@@ -69,8 +71,6 @@ RUN mkdir -p "${CALIBRE_LIBRARY}" && mkdir -p "${CALIBRE_LIBRARY}/import" && \
 # remove build package
 RUN apt-get autoremove -y python-dev build-essential && rm -rf /tmp/* /var/cache/apk/*
 
-COPY start.sh ${VNC_HOME}/start.sh
-RUN chown -R ${VNC_USER}:${VNC_USER} ${VNC_HOME}
 
 EXPOSE ${CALIBRE_PORT} ${VNC_PORT}
 WORKDIR ${VNC_HOME}
