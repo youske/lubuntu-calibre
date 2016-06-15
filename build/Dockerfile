@@ -43,7 +43,7 @@ ENV VNC_USER="${VNC_USER:-vnc}" \
     VNC_PORT="${VNC_PORT:-5901}" \
     VNC_DEPTH="${VNC_DEPTH:-24}" \
     VNC_DISPLAY="${VNC_DISPLAY:-1}" \
-    VNC_GEOMETRY="${VNC_GEOMETRY:-1280x768}"
+    VNC_GEOMETRY="${VNC_GEOMETRY:-1280x1024}"
 
 ENV VNC_HOME="/home/${VNC_USER}"
 
@@ -71,6 +71,9 @@ RUN mkdir -p "${CALIBRE_LIBRARY}" && mkdir -p "${CALIBRE_LIBRARY}/import" && \
 # remove build package
 RUN apt-get autoremove -y python-dev build-essential && rm -rf /tmp/* /var/cache/apk/*
 
+# password testing
+#COPY bashpasswd.sh /tmp/bashpasswd.sh
+#ENV TESTINGPASSWD=${ABCD:-`/bin/bash /tmp/bashpasswd.sh 8`}
 
 EXPOSE ${CALIBRE_PORT} ${VNC_PORT}
 WORKDIR ${VNC_HOME}
