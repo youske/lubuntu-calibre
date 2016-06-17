@@ -1,0 +1,17 @@
+
+
+
+
+
+# password testing
+#COPY bashpasswd.sh /tmp/bashpasswd.sh
+#ENV TESTINGPASSWD=${ABCD:-`/bin/bash /tmp/bashpasswd.sh 8`}
+
+# tigervnc
+#RUN wget http://winswitch.org/gpg.asc -O- | apt-key add -
+#RUN echo "deb http://winswitch.org/ xenial main" > /etc/apt/sources.list.d/winswitch.list
+
+#RUN apt-get install -y software-properties-common && \
+#   add-apt-repository universe && \
+#   apt-get update
+#   apt-get install -y tigervnc-server

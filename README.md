@@ -28,6 +28,10 @@ https://github.com/tianon/gosu
 lubuntu (lxde)
 日本語フォント+
 
+vnc
+tigervnc-server
+
+
 # パスワードの再設定
 user: admin
 pass: admin

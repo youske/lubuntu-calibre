@@ -1,7 +1,12 @@
 #!/bin/bash
 set -e
 
-apt-get install -y tightvncserver
+wget -q https://bintray.com/tigervnc/stable/download_file?file_path=tigervnc-Linux-x86_64-1.6.0.tar.gz -O- | tar zx -C /tmp
+cp -r /tmp/usr/bin/* /usr/bin
+cp -r /tmp/usr/lib64/* /usr/lib
+cp -r /tmp/usr/share/* /usr/share
+#apt-get install -y tightvncserver
+
 useradd -m -U -s /bin/bash ${VNC_USER}
 echo "${VNC_USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
 chown -R ${VNC_USER}:${VNC_USER} ${VNC_HOME}
