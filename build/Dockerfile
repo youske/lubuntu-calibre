@@ -5,7 +5,7 @@ FROM ubuntu:16.04
 MAINTAINER youske miyakoshi <youske@gmail.com>
 
 LABEL com.geeplus.description="lubuntu calibre image" \
-      com.geeplus.role="calibreimage"
+      com.geeplus.role="calibre"
 
 #----- common -----
 
@@ -27,8 +27,6 @@ ENV COMMONPACKAGE='bash vim-tiny logrotate supervisor git bzip2 curl wget ca-cer
     LUBUNTUPACKAGE='xorg xterm lxde-core lxappearance lxsession-data lxterminal lxinput lubuntu-icon-theme lubuntu-artwork-16-04 lubuntu-lxpanel-icons lubuntu-artwork xfonts-100dpi xfonts-100dpi-transcoded xfonts-75dpi xfonts-75dpi-transcoded xfonts-base ' \
     FONTPACKAGE='fonts-ipafont-mincho fonts-ipafont-gothic' \
     LANGPACKAGE='locales language-pack-ja language-pack-ja ibus-mozc'
-
-#lxkeymap lximage-qt lxrandr lxlauncher
 
 # apt-get install
 RUN apt-get update && apt-get -y upgrade && \
@@ -69,14 +67,14 @@ ENV VNC_USER="${VNC_USER:-vnc}" \
     VNC_PORT="${VNC_PORT:-5901}" \
     VNC_DEPTH="${VNC_DEPTH:-24}" \
     VNC_DISPLAY="${VNC_DISPLAY:-1}" \
-    VNC_GEOMETRY="${VNC_GEOMETRY:-1280x1024}"
+    VNC_GEOMETRY="${VNC_GEOMETRY:-1280x800}"
 
 ENV VNC_HOME="/home/${VNC_USER}"
 
 COPY install_vnc /tmp/install_vnc
 RUN . /tmp/install_vnc
 COPY start.sh ${VNC_HOME}/start.sh
-RUN chown -R ${VNC_USER}:${VNC_USER} ${VNC_HOME}
+RUN chmod +x ${VNC_HOME}/start.sh && chown -R ${VNC_USER}:${VNC_USER} ${VNC_HOME}
 
 #
 COPY xstartup ${VNC_HOME}/.vnc/
@@ -89,4 +87,4 @@ RUN apt-get autoremove -y python-dev build-essential && rm -rf /tmp/* /var/cache
 EXPOSE ${CALIBRE_PORT} ${VNC_PORT}
 WORKDIR ${VNC_HOME}
 ENTRYPOINT ["switch","shell=/bin/bash","--","/init"]
-CMD ["${VNC_HOME}/start.sh"]
+CMD ["gosu","vnc","vncserver",":${VNC_DISPLAY}","-fg","-geometry","${VNC_GEOMETRY}"]
