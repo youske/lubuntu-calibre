@@ -1,13 +1,13 @@
 version: "2"
 services:
 
-  calibreimage:
+  calibre:
     build: build
     ulimits:
+      nproc: 65535
       nofile:
         soft: 20000
         hard: 40000
-      nproc: 65535
     ports:
       - "5901:5901"
       - "8808:8808"

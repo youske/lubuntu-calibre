@@ -12,7 +12,6 @@ LABEL com.geeplus.description="lubuntu calibre image" \
 # s6-overlay
 ENV S6OVERLAY_VERSION="v1.11.0.1"
 ENV S6OVERLAY_URL="https://github.com/just-containers/s6-overlay/releases/download/${S6OVERLAY_VERSION}/s6-overlay-amd64.tar.gz"
-
 ADD ${S6OVERLAY_URL} /tmp/
 
 # entrykit
@@ -87,4 +86,4 @@ RUN apt-get autoremove -y python-dev build-essential && rm -rf /tmp/* /var/cache
 EXPOSE ${CALIBRE_PORT} ${VNC_PORT}
 WORKDIR ${VNC_HOME}
 ENTRYPOINT ["switch","shell=/bin/bash","--","/init"]
-CMD ["gosu","vnc","vncserver",":${VNC_DISPLAY}","-fg","-geometry","${VNC_GEOMETRY}"]
+CMD ["gosu","vnc","vncserver",":${VNC_DISPLAY}","-fg","-geometry","${VNC_GEOMETRY}","-depth","${VNC_DEPTH}"]
