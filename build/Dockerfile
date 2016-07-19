@@ -4,8 +4,9 @@
 FROM ubuntu:16.04
 MAINTAINER youske miyakoshi <youske@gmail.com>
 
-LABEL com.geeplus.description="lubuntu calibre image" \
-      com.geeplus.role="calibre"
+LABEL com.geeplus.description="lubuntu calibre ebook management image" \
+      com.geeplus.role="calibre" \
+      com.geeplus.os="ubuntu"
 
 #----- common -----
 
@@ -51,10 +52,10 @@ ENV CALIBRE_USER='calibre' \
     CALIBRE_PORT=8088 \
     CALIBRE_LIBRARY="/Calibre_Library" \
     CALIBRE_URL=https://raw.githubusercontent.com/kovidgoyal/calibre/master/setup/linux-installer.py \
-    CALIBRE_PACKAGE='imagemagick python-pip python-dev build-essential'
+    CALIBRE_PACKAGE='imagemagick okular python-pip python-dev build-essential'
 
 # calibre install
-RUN apt-get install -y  ${CALIBRE_PACKAGE} && \
+RUN DEBIAN_FRONTEND=nointeractive apt-get install -y  ${CALIBRE_PACKAGE} && \
     wget -q --no-check-certificate ${CALIBRE_URL} -O- | python -c "import sys; main=lambda:sys.stderr.write('Download Failed\n'); exec(sys.stdin.read()); main()"
 RUN mkdir -p "${CALIBRE_LIBRARY}" && mkdir -p "${CALIBRE_LIBRARY}/import" && \
     chown -R ${VNC_USER}:${VNC_USER} "${CALIBRE_LIBRARY}"
