@@ -18,8 +18,8 @@ tests/*
 Thumbs.db
 .tags
 *.swp
-*.lock
 *.lck
+*.lock
 *.*~
 *~
 

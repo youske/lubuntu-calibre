@@ -1,27 +1,14 @@
 # Lubuntu Linux with calibre
 # ubuntu:16.04
 
-FROM ubuntu:16.04
+FROM youske/ubuntu-stdmachine:base
 MAINTAINER youske miyakoshi <youske@gmail.com>
 
-LABEL com.geeplus.description="lubuntu calibre ebook management image" \
-      com.geeplus.role="calibre" \
-      com.geeplus.os="ubuntu"
+LABEL com.stdmachine.description="lubuntu calibre ebook management image" \
+      com.stdmachine.role="calibre" \
+      com.stdmachine.os="ubuntu"
 
 #----- common -----
-
-# s6-overlay
-ENV S6OVERLAY_VERSION="v1.11.0.1"
-ENV S6OVERLAY_URL="https://github.com/just-containers/s6-overlay/releases/download/${S6OVERLAY_VERSION}/s6-overlay-amd64.tar.gz"
-ADD ${S6OVERLAY_URL} /tmp/
-
-# entrykit
-ENV ENTRYKIT_VERSION=0.4.0
-ENV ENTRYKIT_FILE=entrykit_${ENTRYKIT_VERSION}_Linux_x86_64.tgz
-ENV ENTRYKIT_DOWNLOAD=https://github.com/progrium/entrykit/releases/download/v${ENTRYKIT_VERSION}/${ENTRYKIT_FILE}
-
-ENV GOSU_VERSION=1.7
-ENV GOSU_DOWNLOAD=https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-amd64
 
 ENV COMMONPACKAGE='bash vim-tiny logrotate supervisor git bzip2 curl wget ca-certificates' \
     LUBUNTUPACKAGE='xorg xterm lxde-core lxappearance lxsession-data lxterminal lxinput lubuntu-icon-theme lubuntu-artwork-16-04 lubuntu-lxpanel-icons lubuntu-artwork xfonts-100dpi xfonts-100dpi-transcoded xfonts-75dpi xfonts-75dpi-transcoded xfonts-base ' \
@@ -32,17 +19,6 @@ ENV COMMONPACKAGE='bash vim-tiny logrotate supervisor git bzip2 curl wget ca-cer
 RUN apt-get update && apt-get -y upgrade && \
     DEBIAN_FRONTEND=nointeractive apt-get install -y ${COMMONPACKAGE} ${LUBUNTUPACKAGE} ${FONTPACKAGE} ${LANGPACKAGE} && \
     update-locale LANG=${LANGUAGE:-ja_JP.UTF-8}
-
-# entrykit install
-RUN wget -q --no-check-certificate ${ENTRYKIT_DOWNLOAD} -O- | tar zx && \
-    chmod +x /entrykit && mv /entrykit /usr/bin && /usr/bin/entrykit --symlink
-
-# gosu
-RUN wget -q --no-check-certificate ${GOSU_DOWNLOAD} -O /usr/bin/gosu && chmod +x /usr/bin/gosu
-
-# s6-overlay
-RUN tar zxf /tmp/s6-overlay-amd64.tar.gz -C /
-
 
 #------ calibre ------
 
@@ -55,8 +31,10 @@ ENV CALIBRE_USER='calibre' \
     CALIBRE_PACKAGE='imagemagick okular python-pip python-dev build-essential'
 
 # calibre install
-RUN DEBIAN_FRONTEND=nointeractive apt-get install -y  ${CALIBRE_PACKAGE} && \
-    wget -q --no-check-certificate ${CALIBRE_URL} -O- | python -c "import sys; main=lambda:sys.stderr.write('Download Failed\n'); exec(sys.stdin.read()); main()"
+RUN DEBIAN_FRONTEND=nointeractive apt-get install -y -q ${CALIBRE_PACKAGE}
+# && \
+#RUN    curl -L ${CALIBRE_URL} | python -c "import sys; main=lambda:sys.stderr.write('Download Failed\n'); exec(sys.stdin.read()); main()"
+RUN wget -q --no-check-certificate ${CALIBRE_URL} -O- | python -c "import sys; main=lambda:sys.stderr.write('Download Failed\n'); exec(sys.stdin.read()); main()"
 RUN mkdir -p "${CALIBRE_LIBRARY}" && mkdir -p "${CALIBRE_LIBRARY}/import" && \
     chown -R ${VNC_USER}:${VNC_USER} "${CALIBRE_LIBRARY}"
 

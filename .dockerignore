@@ -20,7 +20,7 @@ README*
 Thumbs.db
 .tags
 *.swp
-*.lock
 *.lck
+*.lock
 *.*~
 *~

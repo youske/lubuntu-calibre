@@ -1,5 +1,5 @@
-dockerfile lubuntu (xenial) with calibre
-===========================+++++++++====
+dockerfile lubuntu (xenial) with calibre vnc
+============================================
 
 # 概要
 lubuntu(ubuntu 16.04) ベースにebook管理用calibreを導入したイメージ
@@ -7,20 +7,17 @@ calibreと書籍公開用サーバ
 okular
 
 
-# 導入
-docker image
+# docker pull
+    docker pull youske/lubuntu-calibre
 
-    git pull youske/lubuntu-calibre
+# docker run
+    vnc = 5901
+    calibre server = 8088
 
-
-# 起動
-
-default
-
+    standard
     docker run -it -p 5901:5901 -p 8088:8088 --rm youske/lubuntu-calibre
 
-shellmode
-
+    shellmode
     docker run -it -p 5901:5901 -p 8088:8088 --rm youske/lubuntu-calibre shell
 
 
