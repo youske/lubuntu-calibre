@@ -7,7 +7,6 @@ tests/*
 #
 .sync-config.cson
 .remote-sync.json
-.editorconfig
 
 #
 [cCgGeE]tags

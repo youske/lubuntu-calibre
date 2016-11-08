@@ -33,7 +33,6 @@ ENV CALIBRE_USER='calibre' \
 # calibre install
 RUN DEBIAN_FRONTEND=nointeractive apt-get install -y -q ${CALIBRE_PACKAGE}
 # && \
-#RUN    curl -L ${CALIBRE_URL} | python -c "import sys; main=lambda:sys.stderr.write('Download Failed\n'); exec(sys.stdin.read()); main()"
 RUN wget -q --no-check-certificate ${CALIBRE_URL} -O- | python -c "import sys; main=lambda:sys.stderr.write('Download Failed\n'); exec(sys.stdin.read()); main()"
 RUN mkdir -p "${CALIBRE_LIBRARY}" && mkdir -p "${CALIBRE_LIBRARY}/import" && \
     chown -R ${VNC_USER}:${VNC_USER} "${CALIBRE_LIBRARY}"

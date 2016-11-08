@@ -5,6 +5,7 @@ dockerfile lubuntu (xenial) with calibre vnc
 lubuntu(ubuntu 16.04) ベースにebook管理用calibreを導入したイメージ
 calibreと書籍公開用サーバ
 okular
+アクセス方法としてvncを内蔵しているのでvncにてアクセスする
 
 
 # docker pull
