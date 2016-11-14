@@ -10,13 +10,13 @@ LABEL com.stdmachine.description="lubuntu calibre ebook management image" \
 
 #----- common -----
 
-ENV COMMONPACKAGE='bash vim-tiny logrotate supervisor git bzip2 curl wget ca-certificates' \
+ENV COMMONPACKAGE='bash vim-tiny logrotate supervisor git tig tmux bzip2 curl wget ca-certificates' \
     LUBUNTUPACKAGE='xorg xterm lxde-core lxappearance lxsession-data lxterminal lxinput lubuntu-icon-theme lubuntu-artwork-16-04 lubuntu-lxpanel-icons lubuntu-artwork xfonts-100dpi xfonts-100dpi-transcoded xfonts-75dpi xfonts-75dpi-transcoded xfonts-base ' \
     FONTPACKAGE='fonts-ipafont-mincho fonts-ipafont-gothic' \
     LANGPACKAGE='locales language-pack-ja language-pack-ja ibus-mozc'
 
 # apt-get install
-RUN apt-get update && apt-get -y upgrade && \
+RUN apt-get update && apt-get -y -q upgrade && \
     DEBIAN_FRONTEND=nointeractive apt-get install -y ${COMMONPACKAGE} ${LUBUNTUPACKAGE} ${FONTPACKAGE} ${LANGPACKAGE} && \
     update-locale LANG=${LANGUAGE:-ja_JP.UTF-8}
 
